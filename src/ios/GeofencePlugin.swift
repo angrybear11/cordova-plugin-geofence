@@ -143,7 +143,7 @@ func log(_ messages: [String]) {
         }
     }
 
-    func didReceiveTransition (_ notification: Notification) {
+    @objc func didReceiveTransition (_ notification: Notification) {
         log("didReceiveTransition")
         if let geoNotificationString = notification.object as? String {
 
@@ -153,7 +153,7 @@ func log(_ messages: [String]) {
         }
     }
 
-    func didReceiveLocalNotification (_ notification: Notification) {
+    @objc func didReceiveLocalNotification (_ notification: Notification) {
         log("didReceiveLocalNotification")
         if UIApplication.shared.applicationState != UIApplicationState.active {
             var data = "undefined"
@@ -394,7 +394,7 @@ class GeoNotificationManager : NSObject, CLLocationManagerDelegate {
     func handleTransition(_ region: CLRegion!, transitionType: Int) {
         if var geoNotification = store.findById(region.identifier) {
             geoNotification["transitionType"].int = transitionType
-            
+
             if geoNotification["notification"].exists() {
                 notifyAbout(geoNotification)
             }
@@ -487,7 +487,7 @@ class GeoNotificationStore {
         } else {
             if (resultSet.count > 0) {
                 let jsonString = resultSet[0]["Data"]!.asString()!
-                return JSON(data: jsonString.data(using: String.Encoding.utf8)!)
+                return try! JSON(data: jsonString.data(using: String.Encoding.utf8)!)
             }
             else {
                 return nil
@@ -506,7 +506,7 @@ class GeoNotificationStore {
             var results = [JSON]()
             for row in resultSet {
                 if let data = row["Data"]?.asString() {
-                    results.append(JSON(data: data.data(using: String.Encoding.utf8)!))
+                    results.append(try! JSON(data: data.data(using: String.Encoding.utf8)!))
                 }
             }
             return results
